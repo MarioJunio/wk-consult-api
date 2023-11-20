@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  # MySQL database
+  mysqld:
+    image: mysql
+    container_name: mysqld
+    environment:
+      MYSQL_ROOT_PASSWORD: mario
+      MYSQL_DATABASE: wk
+      MYSQL_USER: mario
+      MYSQL_PASSWORD: mario
+    ports:
+      - "3306:3306"
+    networks:
+      - spring-mysql-network
+
+  # Spring Boot application service
+  spring-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysqld
+    restart: on-failure
+    networks:
+      - spring-mysql-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqld:3306/wk
+      SPRING_DATASOURCE_USERNAME: mario
+      SPRING_DATASOURCE_PASSWORD: mario
+
+networks:
+  spring-mysql-network:
